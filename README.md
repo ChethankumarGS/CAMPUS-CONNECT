@@ -4,7 +4,7 @@
 
 A comprehensive web application for managing academic departments, including courses, materials, and user management with different roles (students, lecturers, and admins).
 
-The Department Management System (DMS) is designed to streamline educational operations by providing a platform for course management, student enrollment, learning materials distribution, and administrative tasks. The application features role-based access controls, real-time updates, and a responsive user interface.
+The CAMPUS-CONNECT System is designed to streamline educational operations by providing a platform for course management, student enrollment, learning materials distribution, and administrative tasks. The application features role-based access controls, real-time updates, and a responsive user interface.
 
 ## Live Applications
 
