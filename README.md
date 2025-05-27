@@ -14,7 +14,7 @@ The Department Management System (DMS) is designed to streamline educational ope
 ## Documentation
 
 - [Frontend Documentation](https://github.com/oyerohabib/departmentMS/blob/main/frontend/README.md)
-- [Backend Documentation](https://github.com/oyerohabib/departmentMS/blob/main/backend/README.md)
+  
 
 ## Core Features
 
