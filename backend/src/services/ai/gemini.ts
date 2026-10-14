@@ -14,16 +14,20 @@ const apiKey = () => {
 export const isAiConfigured = () => Boolean(process.env.GEMINI_API_KEY);
 
 const post = async (url: string, body: unknown) => {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey() },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
+  let lastErr: Error | null = null;
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey() },
+      body: JSON.stringify(body),
+    });
+    if (res.ok) return res.json() as Promise<any>;
     const detail = await res.text();
-    throw new Error(`Gemini request failed (${res.status}): ${detail.slice(0, 300)}`);
+    lastErr = new Error(`Gemini request failed (${res.status}): ${detail.slice(0, 300)}`);
+    if (res.status !== 429 && res.status !== 503) break;
+    await new Promise((r) => setTimeout(r, 1500 * (attempt + 1)));
   }
-  return res.json() as Promise<any>;
+  throw lastErr as Error;
 };
 
 export const embedTexts = async (
