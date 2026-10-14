@@ -70,3 +70,19 @@ const normalize = (v: number[]) => {
   const norm = Math.sqrt(v.reduce((s, x) => s + x * x, 0)) || 1;
   return v.map((x) => x / norm);
 };
+
+// Fallback for PDFs the local parser can't read: let Gemini transcribe them.
+export const transcribePdf = async (buffer: Buffer): Promise<string> => {
+  const data = await post(`${BASE}/models/${CHAT_MODEL}:generateContent`, {
+    contents: [
+      {
+        role: "user",
+        parts: [
+          { text: "Transcribe all readable text from this document. Output only the text." },
+          { inlineData: { mimeType: "application/pdf", data: buffer.toString("base64") } },
+        ],
+      },
+    ],
+  });
+  return data.candidates?.[0]?.content?.parts?.map((p: any) => p.text).join("") || "";
+};
