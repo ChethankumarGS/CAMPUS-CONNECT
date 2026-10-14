@@ -83,7 +83,7 @@ export const askCourse: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("askCourse failed", error);
-    sendResponse(res, 500, false, "Failed to get an answer", null);
+    sendResponse(res, 500, false, `Failed to get an answer: ${String((error as Error)?.message || error).slice(0, 160)}`, null);
   }
 };
 
