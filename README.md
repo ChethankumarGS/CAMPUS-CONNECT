@@ -8,8 +8,8 @@ The CAMPUS-CONNECT System is designed to streamline educational operations by pr
 
 ## Live Applications
 
-- Frontend: <https://department-ms.vercel.app/>
-- API: <https://departmentms-1.onrender.com/>
+- Frontend: <https://campus-connect-psi-eight.vercel.app/>
+- API: <https://campus-connect-api-bice.vercel.app/>
   
 
 ## Core Features
