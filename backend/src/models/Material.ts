@@ -10,6 +10,7 @@ export interface IMaterial extends Document {
   courseId: Schema.Types.ObjectId | typeof Course;
   uploadedBy: Schema.Types.ObjectId | typeof User;
   indexStatus?: "pending" | "indexed" | "unsupported" | "failed";
+  indexError?: string;
   studyKit?: {
     summary: string;
     quiz: { question: string; options: string[]; answerIndex: number; explanation: string }[];
@@ -27,6 +28,7 @@ const materialSchema = new Schema(
     fileName: { type: String },
     courseId: { type: Schema.Types.ObjectId, ref: "Course", required: true },
     uploadedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    indexError: { type: String },
     indexStatus: {
       type: String,
       enum: ["pending", "indexed", "unsupported", "failed"],

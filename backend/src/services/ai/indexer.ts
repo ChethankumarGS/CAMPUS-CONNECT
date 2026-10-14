@@ -45,6 +45,7 @@ export const indexMaterial = async (materialId: string, file?: Buffer) => {
   } catch (error) {
     console.error("Failed to index material", materialId, error);
     material.indexStatus = "failed";
+    material.indexError = String((error as Error)?.message || error).slice(0, 300);
     await material.save();
   }
 };
