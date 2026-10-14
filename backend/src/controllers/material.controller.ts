@@ -1,7 +1,9 @@
 import { RequestHandler } from "express";
 import { Material } from "../models/Material";
 import { Course } from "../models/Course";
+import mongoose from "mongoose";
 import { MaterialChunk } from "../models/MaterialChunk";
+import { saveFile, streamFile, deleteFile } from "../services/fileStorage";
 import { indexMaterial } from "../services/ai/indexer";
 import { sendResponse } from "../utils/responseHandler";
 
@@ -14,9 +16,15 @@ export const uploadMaterial: RequestHandler = async (req, res) => {
       return;
     }
 
+    const _id = new mongoose.Types.ObjectId();
+    const fileId = await saveFile(file.buffer, file.originalname, file.mimetype);
+
     const material = new Material({
+      _id,
       title: req.body.title,
-      fileUrl: req.file?.path,
+      fileUrl: `/api/materials/file/${_id}`,
+      fileId: String(fileId),
+      fileName: file.originalname,
       courseId,
       uploadedBy: req.user?.userId,
     });
@@ -28,8 +36,10 @@ export const uploadMaterial: RequestHandler = async (req, res) => {
       $addToSet: { materials: material._id },
     });
 
-    // build the AI search index in the background, don't block the response
-    indexMaterial(String(material._id));
+    // build the AI search index before responding (a serverless function can
+    // be frozen once the response is sent). Failures are recorded on the
+    // material and don't fail the upload.
+    await indexMaterial(String(material._id), file.buffer);
 
     sendResponse(res, 201, true, "Material uploaded successfully", material);
   } catch (error) {
@@ -47,6 +57,25 @@ export const getMaterialsByCourse: RequestHandler = async (req, res) => {
   }
 };
 
+export const downloadMaterial: RequestHandler = async (req, res) => {
+  try {
+    const material = await Material.findById(req.params.id);
+    if (!material || !material.fileId) {
+      sendResponse(res, 404, false, "File not found", null);
+      return;
+    }
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${encodeURIComponent(material.fileName || material.title)}"`
+    );
+    streamFile(material.fileId)
+      .on("error", () => res.status(404).end())
+      .pipe(res);
+  } catch (error) {
+    sendResponse(res, 500, false, "Failed to download file", null);
+  }
+};
+
 export const deleteMaterial: RequestHandler = async (req, res) => {
   try {
     const materialId = req.params.id;
@@ -59,6 +88,7 @@ export const deleteMaterial: RequestHandler = async (req, res) => {
     }
 
     await MaterialChunk.deleteMany({ materialId });
+    if (material.fileId) await deleteFile(material.fileId);
 
     // Update the course to remove the deleted material
     await Course.findByIdAndUpdate(material.courseId, {

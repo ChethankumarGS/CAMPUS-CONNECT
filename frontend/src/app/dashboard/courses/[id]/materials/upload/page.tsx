@@ -142,7 +142,7 @@ export default function UploadMaterialPage() {
                   <p className="pl-1">or drag and drop</p>
                 </div>
                 <p className="text-xs text-gray-500">
-                  PDF, PPT, DOC, ZIP up to 10MB
+                  PDF, DOCX, PPT up to 4MB
                 </p>
                 {file && (
                   <p className="text-sm text-green-600 mt-2">

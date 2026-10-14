@@ -5,6 +5,8 @@ import { User } from "./User";
 export interface IMaterial extends Document {
   title: string;
   fileUrl: string;
+  fileId?: string;
+  fileName?: string;
   courseId: Schema.Types.ObjectId | typeof Course;
   uploadedBy: Schema.Types.ObjectId | typeof User;
   indexStatus?: "pending" | "indexed" | "unsupported" | "failed";
@@ -21,6 +23,8 @@ const materialSchema = new Schema(
   {
     title: { type: String, required: true },
     fileUrl: { type: String, required: true },
+    fileId: { type: String },
+    fileName: { type: String },
     courseId: { type: Schema.Types.ObjectId, ref: "Course", required: true },
     uploadedBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
     indexStatus: {

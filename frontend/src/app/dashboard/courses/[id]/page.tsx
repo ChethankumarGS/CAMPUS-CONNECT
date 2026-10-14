@@ -14,6 +14,15 @@ import { useApiError } from "@/hooks/useApiError";
 import AskCourseAI from "@/components/AskCourseAI";
 import StudyKitModal from "@/components/StudyKitModal";
 
+// fileUrl is stored as an API path (/api/materials/file/:id); the API host is
+// whatever NEXT_PUBLIC_API_URL points at.
+const API_ORIGIN = (
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api"
+).replace(/\/api\/?$/, "");
+
+const getFileHref = (fileUrl: string) =>
+  fileUrl.startsWith("/api/") ? `${API_ORIGIN}${fileUrl}` : fileUrl;
+
 interface Params {
   id: string;
 }
@@ -190,7 +199,7 @@ export default function CourseDetailsPage() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <a
-                              href={material.fileUrl}
+                              href={getFileHref(material.fileUrl)}
                               download
                               className="text-blue-600 hover:text-blue-900 mr-4"
                             >

@@ -1,18 +1,11 @@
 import multer from "multer";
 import path from "path";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
-
+// Files are kept in memory and written to MongoDB (GridFS) by the controller.
+// Vercel rejects request bodies over ~4.5MB, so the limit sits just under that.
 const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 4 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowedTypes = [".pdf", ".doc", ".docx", ".ppt", ".pptx"];
     const ext = path.extname(file.originalname).toLowerCase();
