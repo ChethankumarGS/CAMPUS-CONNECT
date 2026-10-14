@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
 import courseRoutes from "./routes/course.routes";
 import materialRoutes from "./routes/material.routes";
+import aiRoutes from "./routes/ai.routes";
 
 dotenv.config();
 
@@ -55,6 +56,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/materials", materialRoutes);
+app.use("/api/ai", aiRoutes);
 
 // Database connection
 mongoose

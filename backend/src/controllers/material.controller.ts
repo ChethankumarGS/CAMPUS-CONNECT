@@ -1,6 +1,8 @@
 import { RequestHandler } from "express";
 import { Material } from "../models/Material";
 import { Course } from "../models/Course";
+import { MaterialChunk } from "../models/MaterialChunk";
+import { indexMaterial } from "../services/ai/indexer";
 import { sendResponse } from "../utils/responseHandler";
 
 export const uploadMaterial: RequestHandler = async (req, res) => {
@@ -25,6 +27,9 @@ export const uploadMaterial: RequestHandler = async (req, res) => {
     await Course.findByIdAndUpdate(courseId, {
       $addToSet: { materials: material._id },
     });
+
+    // build the AI search index in the background, don't block the response
+    indexMaterial(String(material._id));
 
     sendResponse(res, 201, true, "Material uploaded successfully", material);
   } catch (error) {
@@ -52,6 +57,8 @@ export const deleteMaterial: RequestHandler = async (req, res) => {
       sendResponse(res, 404, false, "Material not found", null);
       return;
     }
+
+    await MaterialChunk.deleteMany({ materialId });
 
     // Update the course to remove the deleted material
     await Course.findByIdAndUpdate(material.courseId, {

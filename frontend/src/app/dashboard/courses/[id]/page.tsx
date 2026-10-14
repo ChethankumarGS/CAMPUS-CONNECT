@@ -11,6 +11,8 @@ import { CourseWithDetails } from "@/types/course";
 import { Material } from "@/types/material";
 import { User } from "@/types/user";
 import { useApiError } from "@/hooks/useApiError";
+import AskCourseAI from "@/components/AskCourseAI";
+import StudyKitModal from "@/components/StudyKitModal";
 
 interface Params {
   id: string;
@@ -24,6 +26,7 @@ export default function CourseDetailsPage() {
   const [activeTab, setActiveTab] = useState("materials");
   const [students, setStudents] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [kitMaterial, setKitMaterial] = useState<Material | null>(null);
   const { error, handleError } = useApiError();
 
   useEffect(() => {
@@ -141,6 +144,16 @@ export default function CourseDetailsPage() {
           >
             Enrolled Students
           </button>
+          <button
+            className={`px-6 py-3 text-sm font-medium ${
+              activeTab === "ask"
+                ? "border-b-2 border-blue-500 text-blue-600"
+                : "text-gray-500 hover:text-gray-700"
+            }`}
+            onClick={() => setActiveTab("ask")}
+          >
+            Ask AI
+          </button>
         </div>
 
         <div className="p-6">
@@ -183,6 +196,12 @@ export default function CourseDetailsPage() {
                             >
                               Download
                             </a>
+                            <button
+                              onClick={() => setKitMaterial(material)}
+                              className="text-purple-600 hover:text-purple-900 mr-4"
+                            >
+                              Study kit
+                            </button>
                             {user?.role === "lecturer" && (
                               <button
                                 onClick={() =>
@@ -216,6 +235,9 @@ export default function CourseDetailsPage() {
               )}
             </div>
           )}
+
+          {/* Ask AI Tab */}
+          {activeTab === "ask" && <AskCourseAI courseId={id} />}
 
           {/* Students Tab */}
           {activeTab === "students" && (
@@ -259,6 +281,14 @@ export default function CourseDetailsPage() {
           )}
         </div>
       </div>
+      {kitMaterial && (
+        <StudyKitModal
+          materialId={kitMaterial._id}
+          title={kitMaterial.title}
+          canGenerate={user?.role === "lecturer" || user?.role === "admin"}
+          onClose={() => setKitMaterial(null)}
+        />
+      )}
     </div>
   );
 }
