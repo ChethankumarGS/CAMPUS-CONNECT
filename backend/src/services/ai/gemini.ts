@@ -2,7 +2,7 @@
 // there is no extra SDK to install.
 const BASE = "https://generativelanguage.googleapis.com/v1beta";
 const EMBED_MODEL = process.env.GEMINI_EMBED_MODEL || "gemini-embedding-001";
-const CHAT_MODEL = process.env.GEMINI_CHAT_MODEL || "gemini-2.0-flash";
+const CHAT_MODEL = process.env.GEMINI_CHAT_MODEL || "gemini-3.8-flash";
 const EMBED_DIMS = 768;
 
 const apiKey = () => {
