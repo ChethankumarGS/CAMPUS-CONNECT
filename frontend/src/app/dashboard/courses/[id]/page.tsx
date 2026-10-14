@@ -294,7 +294,7 @@ export default function CourseDetailsPage() {
         <StudyKitModal
           materialId={kitMaterial._id}
           title={kitMaterial.title}
-          canGenerate={user?.role === "lecturer" || user?.role === "admin"}
+          canGenerate
           onClose={() => setKitMaterial(null)}
         />
       )}

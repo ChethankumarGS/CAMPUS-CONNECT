@@ -1,6 +1,6 @@
 import express from "express";
 import rateLimitAi from "../middlewares/aiRateLimit";
-import { authenticate, authorize } from "../middlewares/auth.middleware";
+import { authenticate } from "../middlewares/auth.middleware";
 import {
   askCourse,
   generateStudyKit,
@@ -14,7 +14,6 @@ router.get("/materials/:id/study-kit", authenticate, getStudyKit);
 router.post(
   "/materials/:id/study-kit",
   authenticate,
-  authorize(["lecturer", "admin"]),
   rateLimitAi,
   generateStudyKit
 );

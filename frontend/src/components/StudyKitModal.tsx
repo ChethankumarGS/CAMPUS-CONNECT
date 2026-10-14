@@ -26,7 +26,7 @@ export default function StudyKitModal({
   useEffect(() => {
     aiService
       .getStudyKit(materialId)
-      .then((res) => setKit(res.data))
+      .then((res) => setKit(res.data?.summary ? res.data : null))
       .catch(() => setError("Could not load the study kit"))
       .finally(() => setLoading(false));
   }, [materialId]);
@@ -61,7 +61,7 @@ export default function StudyKitModal({
         {!loading && !kit && (
           <p className="text-gray-600 mb-3">
             No study kit yet.{" "}
-            {!canGenerate && "Your lecturer hasn't generated one for this material."}
+            
           </p>
         )}
 
