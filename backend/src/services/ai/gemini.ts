@@ -2,7 +2,11 @@
 // there is no extra SDK to install.
 const BASE = "https://generativelanguage.googleapis.com/v1beta";
 const EMBED_MODEL = process.env.GEMINI_EMBED_MODEL || "gemini-embedding-001";
-const CHAT_MODEL = process.env.GEMINI_CHAT_MODEL || "gemini-3.8-flash";
+// Model availability on the free tier changes often, so try a few in order.
+const CHAT_MODELS = (
+  process.env.GEMINI_CHAT_MODEL ||
+  "gemini-3.5-flash,gemini-3.1-flash-lite,gemini-3-flash-preview,gemini-3.8-flash"
+).split(",");
 const EMBED_DIMS = 768;
 
 const apiKey = () => {
@@ -15,18 +19,30 @@ export const isAiConfigured = () => Boolean(process.env.GEMINI_API_KEY);
 
 const post = async (url: string, body: unknown) => {
   let lastErr: Error | null = null;
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 2; attempt++) {
     const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey() },
       body: JSON.stringify(body),
-      signal: AbortSignal.timeout(18000),
+      signal: AbortSignal.timeout(15000),
     });
     if (res.ok) return res.json() as Promise<any>;
     const detail = await res.text();
     lastErr = new Error(`Gemini request failed (${res.status}): ${detail.slice(0, 300)}`);
     if (res.status !== 429 && res.status !== 503) break;
     await new Promise((r) => setTimeout(r, 1000 * (attempt + 1)));
+  }
+  throw lastErr as Error;
+};
+
+const generateWithFallback = async (body: unknown) => {
+  let lastErr: Error | null = null;
+  for (const model of CHAT_MODELS) {
+    try {
+      return await post(`${BASE}/models/${model}:generateContent`, body);
+    } catch (e) {
+      lastErr = e as Error;
+    }
   }
   throw lastErr as Error;
 };
@@ -56,7 +72,7 @@ export const generate = async (
   prompt: string,
   opts: { system?: string; json?: boolean } = {}
 ): Promise<string> => {
-  const data = await post(`${BASE}/models/${CHAT_MODEL}:generateContent`, {
+  const data = await generateWithFallback({
     systemInstruction: opts.system
       ? { parts: [{ text: opts.system }] }
       : undefined,
@@ -78,7 +94,7 @@ const normalize = (v: number[]) => {
 
 // Fallback for PDFs the local parser can't read: let Gemini transcribe them.
 export const transcribePdf = async (buffer: Buffer): Promise<string> => {
-  const data = await post(`${BASE}/models/${CHAT_MODEL}:generateContent`, {
+  const data = await generateWithFallback({
     contents: [
       {
         role: "user",
