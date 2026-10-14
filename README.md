@@ -110,3 +110,22 @@ The CAMPUS-CONNECT System is designed to streamline educational operations by pr
 - Assignment creation and management
 
 
+
+## AI features
+
+Students can ask questions about a course and get answers taken from the uploaded PDF/DOCX materials, with the source passages shown. Lecturers can generate a summary and a short quiz for any material.
+
+How it works: when a file is uploaded its text is extracted, split into chunks and embedded with Gemini. The vectors are stored in MongoDB next to the rest of the data, and a question is answered from the closest chunks.
+
+### Backend environment variables
+
+| Variable | Purpose |
+| --- | --- |
+| `MONGODB_URI` | MongoDB connection string |
+| `JWT_SECRET` | Secret used to sign login tokens |
+| `GEMINI_API_KEY` | Free key from Google AI Studio |
+| `FRONTEND_URL` | Deployed frontend origin (for CORS) |
+
+The frontend needs `NEXT_PUBLIC_API_URL` pointing at the backend, e.g. `https://your-api.vercel.app/api`.
+
+Uploads are stored in MongoDB (GridFS) and limited to 4MB so the backend can run on Vercel.
