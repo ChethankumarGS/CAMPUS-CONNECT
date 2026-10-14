@@ -2,9 +2,9 @@
 
 ## Overview
 
-A comprehensive web application for managing academic departments, including courses, materials, and user management with different roles (students, lecturers, and admins).
+A full-stack web application for academic departments: courses, learning materials and enrollment, with different roles (students, lecturers, and admins). It also has an AI course assistant: ask questions about uploaded course materials and get answers with citations, and generate a summary and quiz for any material (Gemini).
 
-The CAMPUS-CONNECT System is designed to streamline educational operations by providing a platform for course management, student enrollment, learning materials distribution, and administrative tasks. The application features role-based access controls, real-time updates, and a responsive user interface.
+The CAMPUS-CONNECT System is designed to streamline educational operations by providing a platform for course management, student enrollment, learning materials distribution, and administrative tasks. The application features role-based access controls and a responsive user interface.
 
 ## Live Applications
 
